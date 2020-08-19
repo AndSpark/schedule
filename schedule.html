@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+    color: #333;
+  }
+
+  html {
+    height: 100vh;
+  }
+
+  body {
+    height: 100%;
+    background-image: linear-gradient(60deg, #81ecec, #74b9ff, #55efc4, #ffeaa7, #fab1a0, #ff7675, #fd79a8, #ff7675, #fab1a0, #ffeaa7, #55efc4, #74b9ff, #81ecec);
+    background-size: 2000%;
+    overflow: hidden;
+    animation: light 100s linear infinite reverse;
+  }
+
+  @keyframes light {
+    0% {
+      background-position: 0 0;
+    }
+
+    100% {
+      background-position: -100% 0;
+    }
+  }
+
+  .left {
+    flex: 1;
+  }
+
+  .right {
+    flex: 1;
+  }
+
+  .content {
+    height: 100%;
+    display: flex;
+  }
+
+  .center {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex: 4;
+  }
+
+  ul {
+    width: 98%;
+    height: 95%;
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 10px;
+  }
+
+  li {
+    font-size: 20px;
+    height: 100%;
+    display: flex;
+    font-family: 'Ink Free';
+    transition: 1s;
+    overflow: hidden;
+  }
+
+  .date,
+  .act {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .date p {
+    width: 96%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.109);
+    margin: 3px;
+  }
+
+  .active {
+    background: url(./wave.png) no-repeat -300% 100%;
+    animation-name: waveX, waveY;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes waveY {
+    100% {
+      background-size: 200% 115%;
+    }
+  }
+
+  @keyframes waveX {
+    0% {
+      background-position: 0% 100%;
+    }
+
+    100% {
+      background-position: 100% 100%;
+    }
+  }
+
+  .date p:nth-of-type(1) {
+    flex: 1;
+  }
+
+  .date p:nth-of-type(2) {
+    flex: 1;
+  }
+
+  .date p:nth-of-type(3) {
+    flex: 5;
+  }
+
+  .date p:nth-of-type(4) {
+    flex: 1;
+  }
+
+  .act {
+    flex: 3;
+    margin: 1px 3px;
+    box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.109);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  [time] {
+    padding-top: 10%;
+    flex: 2;
+  }
+
+  [status] {
+    flex: 4;
+  }
+</style>
+
+<body>
+  <div class="content">
+    <div class="left">
+    </div>
+    <div class="center">
+      <ul>
+        <li>
+          <div class="date">
+            <p></p>
+            <p></p>
+            <p></p>
+          </div>
+          <div class="act">
+            <p time></p>
+            <p status></p>
+          </div>
+        </li>
+        <li>
+          <div class="date">
+            <p></p>
+            <p></p>
+            <p></p>
+          </div>
+          <div class="act">
+            <p time></p>
+            <p status></p>
+          </div>
+        </li>
+        <li>
+          <div class="date">
+            <p></p>
+            <p></p>
+            <p></p>
+            <p></p>
+          </div>
+          <div class="act">
+            <p time></p>
+            <p status></p>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="right"></div>
+  </div>
+
+  <script>
+    class Schedule {
+      constructor() {
+        this.date = new Date()
+        this.isShow = true
+        this.plan = {
+          'Before 08:00': 'Sleeping...',
+          '08:00-08:30': 'Breakfast...',
+          '08:30-12:00': 'Studying...',
+          '12:00-13:15': 'Lunching...zzz..',
+          '13:15-14:50': 'Studying...',
+          '15:00-17:00': 'Studying...',
+          '17:00-18:30': 'Keep...Dinner...',
+          '18:30-20:00': 'Studying...',
+          '20:00-23:00': 'Gaming...Relaxing...',
+          'After 23:00': 'Sleeping...'
+        }
+      }
+      createTime() {
+        let p = [...document.querySelectorAll('p')].filter(v => {
+          return v.parentNode.classList.contains('date')
+        })
+        Object.entries(this.plan).forEach(([key, value], i) => {
+          p[i].innerHTML = key
+        })
+      }
+      static dateFormat(time, format = "YYYY-MM-DD HH:mm:ss") {
+        let config = {
+          YYYY: time.getFullYear(),
+          MM: time.getMonth() + 1,
+          DD: time.getDate(),
+          HH: time.getHours(),
+          mm: time.getMinutes(),
+          ss: time.getSeconds()
+        }
+        for (let key in config) {
+          if (config[key] < 10) {
+            config[key] = '0' + config[key]
+          }
+          format = format.replace(key, config[key])
+        }
+        return format
+      }
+      get Hm() {
+        return Schedule.dateFormat(this.date, "HH:mm")
+      }
+      get now() {
+        return Schedule.dateFormat(this.date)
+      }
+      start() {
+        this.run = true
+        let time = new Schedule().now
+        this.timer = setInterval(() => {
+          time = new Schedule()
+          this.inSection(time.Hm)
+          this.li.querySelector('[time]').innerHTML = time.now
+          time = null
+        }, 1000);
+      }
+      stop() {
+        this.run = false
+        clearInterval(this.timer)
+      }
+
+      bind() {
+        this.createTime()
+        document.querySelectorAll('li').forEach(v => {
+          v.addEventListener('click', () => {
+            this.action(v)
+            clearTimeout(this.timeOut)
+            this.timeOut = setTimeout(() => {
+              this.action(this.li, true)
+            }, 5000);
+          })
+        })
+      }
+
+      action(v, t) {
+        if (this.isShow || t) {
+          this.isShow = false
+          v.setAttribute('show', true)
+          v.style.fontSize = 36 + 'px'
+          document.querySelectorAll('li').forEach(v => {
+            if (!v.getAttribute('show')) {
+              v.style.height = 0;
+              v.style.fontSize = 0
+            }
+          })
+        } else {
+          this.isShow = true
+          document.querySelectorAll('li').forEach(v => {
+            v.removeAttribute('show')
+            v.style.height = 100 + '%'
+            v.style.fontSize = 20 + 'px'
+          })
+        }
+      }
+
+      inSection(Hm) {
+        for (const [key, value] of Object.entries(this.plan)) {
+          if (this.query(Hm, key, value)) return;
+        }
+      }
+
+      query(Hm, range, status) {
+        if (Schedule.section(Hm, range)) {
+          if (this.status == status) return true;
+          document.querySelectorAll('p').forEach(v => {
+            if (v.innerHTML == range) {
+              this.li = v.parentNode.parentNode
+              v.classList.add('active')
+              this.duration(Hm, range)
+              v.style.backgroundSize = `200% ${this.per}%`
+              v.style.animationDuration = `15s,${this.ct}s`
+            }
+          })
+          this.status = status
+          document.querySelectorAll('[status]').forEach(v => {
+            v.classList.remove('active')
+            v.innerHTML = 'Out of time range--'
+
+          })
+          this.li.querySelectorAll('[status]').forEach(v => {
+            setTimeout(() => {
+              let ev = document.createEvent('MouseEvents')
+              ev.initMouseEvent('click', true, false)
+              v.dispatchEvent(ev)
+            }, 5000);
+            v.innerHTML = `<p>Now Should...</p></br> ${status}`
+          })
+        }
+      }
+
+      duration(Hm, range) {
+        let h = Hm.substr(0, 2)
+        let m = Hm.substr(3)
+        let hR1 = range.substr(0, 2)
+        let hR2 = range.substr(6, 2)
+        let mR1 = range.substr(3, 2)
+        let mR2 = range.substr(-2, 2)
+        this.dt = (hR2 - hR1) * 3600 + (mR2 - mR1) * 60
+        this.ct = (hR2 - h) * 3600 + (mR2 - m) * 60
+        this.per = (this.dt - this.ct) / this.dt * 100
+      }
+      static section(Hm, range) {
+        let h = Hm.substr(0, 2)
+        let m = Hm.substr(3)
+        let hR1 = range.substr(0, 2)
+        let hR2 = range.substr(6, 2)
+        let mR1 = range.substr(3, 2)
+        let mR2 = range.substr(-2, 2)
+        if (h == hR1 && h == hR2 && m >= mR1 && m <= mR2) return true;
+        if (h == hR1 && h < hR2 && m >= mR1) return true;
+        if (h > hR1 && h < hR2) return true;
+        if (h > hR1 && h == hR2 && m <= mR2) return true;
+        return false
+      }
+    }
+
+    let schedule = new Schedule()
+    schedule.bind()
+    schedule.start()
+  </script>
+</body>
+
+</html>
